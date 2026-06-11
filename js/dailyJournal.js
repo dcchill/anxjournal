@@ -27,9 +27,6 @@ const streakStickerCatalog = [
 ];
 
 const shopItems = [
-  { id: "sticker-candle", type: "sticker", icon: "Candle", name: "Calm Candle", cost: 25 },
-  { id: "sticker-blanket", type: "sticker", icon: "Blanket", name: "Cozy Blanket", cost: 25 },
-  { id: "sticker-garden", type: "sticker", icon: "Garden", name: "Quiet Garden", cost: 35 },
   { id: "profile-sun", type: "profile", icon: "Sun", name: "Sun Profile", cost: 40 },
   { id: "profile-moon", type: "profile", icon: "Moon", name: "Moon Profile", cost: 40 },
   { id: "profile-leaf", type: "profile", icon: "Leaf", name: "Leaf Profile", cost: 40 },
