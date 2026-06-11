@@ -39,6 +39,8 @@ const closeModalButton = document.querySelector("#closeModal");
 const trendStats = document.querySelector("#trendStats");
 const trendChart = document.querySelector("#trendChart");
 const reminderList = document.querySelector("#reminderList");
+const toast = document.querySelector("#toast");
+let toastTimer = null;
 
 const stickerCatalog = [
   { icon: "Sunrise", name: "Fresh Start" },
@@ -95,9 +97,16 @@ reminderList.addEventListener("click", (event) => {
   openEntryModal(button.dataset.openEntry);
 });
 dailyList.addEventListener("click", (event) => {
-  const button = event.target.closest("[data-edit-daily]");
-  if (!button) return;
-  startDailyEdit(button.dataset.editDaily);
+  const editButton = event.target.closest("[data-edit-daily]");
+  if (editButton) {
+    startDailyEdit(editButton.dataset.editDaily);
+    return;
+  }
+
+  const deleteButton = event.target.closest("[data-delete-daily]");
+  if (deleteButton) {
+    deleteDailyEntry(deleteButton.dataset.deleteDaily);
+  }
 });
 cancelDailyEditButton.addEventListener("click", cancelDailyEdit);
 document.addEventListener("keydown", (event) => {
@@ -163,9 +172,9 @@ dailyForm.addEventListener("submit", (event) => {
   updateRangeLabels();
   render();
   if (newStickers.length) {
-    alert(`Daily entry saved. You earned 10 points and a new sticker: ${newStickers.map((sticker) => sticker.name).join(", ")}.`);
+    showToast(`Daily entry saved. You earned 10 points and a new sticker: ${newStickers.map((sticker) => sticker.name).join(", ")}.`);
   } else {
-    alert(earnedPoints ? "Daily entry saved. You earned 10 points." : "Today's daily entry was updated.");
+    showToast(earnedPoints ? "Daily entry saved. You earned 10 points." : "Today's daily entry was updated.");
   }
 });
 
@@ -384,6 +393,9 @@ function renderDailyJournal() {
         </div>
         <div class="card-actions daily-actions">
           <button class="secondary" type="button" data-edit-daily="${escapeHtml(entry.id)}">Edit</button>
+          <button class="ghost icon-only-button" type="button" data-delete-daily="${escapeHtml(entry.id)}" aria-label="Delete daily entry" title="Delete daily entry">
+            <img src="img/trash-svgrepo-com.svg" alt="" aria-hidden="true">
+          </button>
         </div>
       `;
       dailyList.append(card);
@@ -407,6 +419,22 @@ function startDailyEdit(id) {
 function cancelDailyEdit() {
   resetDailyForm();
   renderDailyJournal();
+}
+
+function deleteDailyEntry(id) {
+  const entry = state.dailyEntries.find((item) => item.id === id);
+  if (!entry) return;
+
+  state.dailyEntries = state.dailyEntries.filter((item) => item.id !== id);
+  if (state.editingDailyId === id) {
+    resetDailyForm();
+  }
+  syncDailyRewards();
+  saveDailyEntries();
+  savePoints();
+  saveStickers();
+  render();
+  showToast(`Deleted daily entry for ${formatDailyDate(entry.dateKey)}.`);
 }
 
 function resetDailyForm() {
@@ -460,6 +488,12 @@ function awardAvailableStickers() {
   }
 
   return newStickers;
+}
+
+function syncDailyRewards() {
+  state.points = getUniqueDailyCount() * 10;
+  state.stickers = [];
+  awardAvailableStickers();
 }
 
 function dailyField(label, value) {
@@ -804,7 +838,7 @@ function deleteEntry(id) {
 }
 
 function exportEntries() {
-  const payload = JSON.stringify(state.entries, null, 2);
+  const payload = JSON.stringify(createBackupPayload(), null, 2);
   const blob = new Blob([payload], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
@@ -812,6 +846,17 @@ function exportEntries() {
   link.download = `anxjournal-${new Date().toISOString().slice(0, 10)}.json`;
   link.click();
   URL.revokeObjectURL(url);
+}
+
+function createBackupPayload() {
+  return {
+    version: 2,
+    exportedAt: new Date().toISOString(),
+    entries: state.entries,
+    dailyEntries: state.dailyEntries,
+    points: state.points,
+    stickers: state.stickers,
+  };
 }
 
 function importEntries() {
@@ -822,28 +867,68 @@ function importEntries() {
   reader.addEventListener("load", () => {
     try {
       const imported = JSON.parse(reader.result);
-      if (!Array.isArray(imported)) {
-        throw new Error("Import file must contain an array of entries.");
-      }
-
-      const normalized = imported.map(normalizeImportedEntry);
-      const existingIds = new Set(state.entries.map((entry) => entry.id));
-      const newEntries = normalized.filter((entry) => !existingIds.has(entry.id));
-      const duplicateCount = normalized.length - newEntries.length;
+      const backup = normalizeBackup(imported);
+      const existingEntryIds = new Set(state.entries.map((entry) => entry.id));
+      const existingDailyIds = new Set(state.dailyEntries.map((entry) => entry.id));
+      const existingDailyDates = new Set(state.dailyEntries.map((entry) => entry.dateKey));
+      const existingStickerIds = new Set(state.stickers.map((sticker) => sticker.id));
+      const newEntries = backup.entries.filter((entry) => !existingEntryIds.has(entry.id));
+      const newDailyEntries = backup.dailyEntries.filter((entry) => {
+        if (existingDailyIds.has(entry.id) || existingDailyDates.has(entry.dateKey)) return false;
+        existingDailyDates.add(entry.dateKey);
+        return true;
+      });
+      const newStickers = backup.stickers.filter((sticker) => !existingStickerIds.has(sticker.id));
+      const duplicateCount = backup.entries.length + backup.dailyEntries.length + backup.stickers.length
+        - newEntries.length - newDailyEntries.length - newStickers.length;
 
       state.entries = [...newEntries, ...state.entries].sort((a, b) => {
         return new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt);
       });
+      state.dailyEntries = [...newDailyEntries, ...state.dailyEntries].sort((a, b) => {
+        return new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt);
+      });
+      state.points = Math.max(state.points, backup.points);
+      state.stickers = [...newStickers, ...state.stickers].sort((a, b) => {
+        return Number(a.milestone || 0) - Number(b.milestone || 0);
+      });
+      state.points = Math.max(state.points, getUniqueDailyCount() * 10);
+      awardAvailableStickers();
       saveEntries();
+      saveDailyEntries();
+      savePoints();
+      saveStickers();
       render();
-      alert(`Imported ${newEntries.length} entries.${duplicateCount ? ` Skipped ${duplicateCount} duplicate entries.` : ""}`);
+      showToast(`Imported ${newEntries.length} anxiety entries, ${newDailyEntries.length} daily entries, and ${newStickers.length} stickers.${duplicateCount ? ` Skipped ${duplicateCount} duplicates.` : ""}`);
     } catch (error) {
-      alert(`Import failed: ${error.message}`);
+      showToast(`Import failed: ${error.message}`);
     } finally {
       importFile.value = "";
     }
   });
   reader.readAsText(file);
+}
+
+function normalizeBackup(imported) {
+  if (Array.isArray(imported)) {
+    return {
+      entries: imported.map(normalizeImportedEntry),
+      dailyEntries: [],
+      points: 0,
+      stickers: [],
+    };
+  }
+
+  if (!imported || typeof imported !== "object") {
+    throw new Error("Import file must contain a backup object or an array of entries.");
+  }
+
+  return {
+    entries: Array.isArray(imported.entries) ? imported.entries.map(normalizeImportedEntry) : [],
+    dailyEntries: Array.isArray(imported.dailyEntries) ? imported.dailyEntries.map(normalizeImportedDailyEntry) : [],
+    points: Number(imported.points || 0),
+    stickers: Array.isArray(imported.stickers) ? imported.stickers.map(normalizeImportedSticker) : [],
+  };
 }
 
 function normalizeImportedEntry(entry) {
@@ -861,6 +946,37 @@ function normalizeImportedEntry(entry) {
     reminderDate: entry.reminderDate || "",
     notes: entry.notes || "",
     reviews: Array.isArray(entry.reviews) ? entry.reviews : [],
+  };
+}
+
+function normalizeImportedDailyEntry(entry) {
+  if (!entry || typeof entry !== "object") {
+    throw new Error("Each imported daily entry must be an object.");
+  }
+
+  const now = new Date().toISOString();
+  const createdAt = entry.createdAt || now;
+  return {
+    ...entry,
+    id: entry.id || crypto.randomUUID(),
+    dateKey: entry.dateKey || toDateKey(new Date(createdAt)),
+    createdAt,
+    updatedAt: entry.updatedAt || createdAt,
+  };
+}
+
+function normalizeImportedSticker(sticker) {
+  if (!sticker || typeof sticker !== "object") {
+    throw new Error("Each imported sticker must be an object.");
+  }
+
+  return {
+    ...sticker,
+    id: sticker.id || crypto.randomUUID(),
+    icon: sticker.icon || "Star",
+    name: sticker.name || "Daily Sticker",
+    milestone: sticker.milestone || 7,
+    earnedAt: sticker.earnedAt || new Date().toISOString(),
   };
 }
 
@@ -905,6 +1021,19 @@ function toDateKey(date) {
 
 function formatDailyDate(dateKey) {
   return new Intl.DateTimeFormat(undefined, { dateStyle: "full" }).format(new Date(`${dateKey}T00:00:00`));
+}
+
+function showToast(message) {
+  window.clearTimeout(toastTimer);
+  toast.textContent = message;
+  toast.classList.remove("hidden", "hiding");
+  toastTimer = window.setTimeout(() => {
+    toast.classList.add("hiding");
+    window.setTimeout(() => {
+      toast.classList.add("hidden");
+      toast.classList.remove("hiding");
+    }, 160);
+  }, 3200);
 }
 
 function shortText(text, maxLength) {

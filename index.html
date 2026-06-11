@@ -9,9 +9,12 @@
   <body>
     <div class="app-shell">
       <header class="topbar">
-        <div>
+        <div class="brand-lockup">
+          <img class="brand-icon" src="img/journal-sharp-svgrepo-com.svg" alt="" aria-hidden="true">
+          <div>
           <p class="eyebrow">AnxJournal</p>
           <h1>Anxiety journal</h1>
+          </div>
         </div>
 
         <nav class="tabs" aria-label="App sections">
@@ -283,8 +286,14 @@
             <div class="toolbar-actions">
               <input id="searchEntries" type="search" placeholder="Search entries">
               <input class="file-input" id="importFile" type="file" accept="application/json,.json">
-              <button class="secondary" type="button" id="importEntries">Import</button>
-              <button class="secondary" type="button" id="exportEntries">Export</button>
+              <button class="secondary icon-text-button" type="button" id="importEntries" aria-label="Import backup">
+                <img src="img/import-svgrepo-com.svg" alt="" aria-hidden="true">
+                <span>Import</span>
+              </button>
+              <button class="secondary icon-text-button" type="button" id="exportEntries" aria-label="Export backup">
+                <img src="img/export-svgrepo-com.svg" alt="" aria-hidden="true">
+                <span>Export</span>
+              </button>
             </div>
           </div>
           <div id="entryList" class="entry-list"></div>
@@ -344,7 +353,9 @@
         <div class="card-actions">
           <button class="secondary view-entry" type="button">View</button>
           <button class="secondary review-entry" type="button">Review</button>
-          <button class="ghost delete-entry" type="button">Delete</button>
+          <button class="ghost icon-only-button delete-entry" type="button" aria-label="Delete entry" title="Delete entry">
+            <img src="img/trash-svgrepo-com.svg" alt="" aria-hidden="true">
+          </button>
         </div>
       </article>
     </template>
