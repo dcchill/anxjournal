@@ -8,17 +8,17 @@
   </head>
   <body>
     <div class="app-shell">
-      <aside class="sidebar">
+      <header class="topbar">
         <div>
           <p class="eyebrow">AnxJournal</p>
           <h1>Anxiety journal</h1>
-          <p class="intro">Name the worry, separate facts from fears, and decide what is actually in your control.</p>
         </div>
 
         <nav class="tabs" aria-label="App sections">
           <button class="tab active" type="button" data-view="journal">New entry</button>
-          <button class="tab" type="button" data-view="review">Review</button>
+          <button class="tab" type="button" data-view="daily">Daily journal</button>
           <button class="tab" type="button" data-view="library">Entries</button>
+          <button class="tab" type="button" data-view="trends">Trends</button>
         </nav>
 
         <section class="status-panel" aria-live="polite">
@@ -28,7 +28,7 @@
             <p id="lastSaved">Nothing saved yet</p>
           </div>
         </section>
-      </aside>
+      </header>
 
       <main>
         <section class="view active" id="journalView">
@@ -36,33 +36,50 @@
             <div>
               <p class="eyebrow">Guided exercise</p>
               <h2>Create a new entry</h2>
+              <p class="intro">Move through one calm question group at a time. You can go back before saving.</p>
             </div>
             <button class="secondary" type="button" id="clearForm">Clear</button>
           </div>
 
           <form id="journalForm" class="workspace">
-            <section class="panel">
-              <h3>What is happening?</h3>
+            <fieldset class="template-switch">
+              <legend>Entry template</legend>
+              <label class="choice"><input type="radio" name="entryTemplate" value="full" checked> Full</label>
+              <label class="choice"><input type="radio" name="entryTemplate" value="quick"> Quick</label>
+            </fieldset>
+            <div class="stepper" aria-label="Journal progress">
+              <span class="step-dot active" data-step-dot="0"></span>
+              <span class="step-dot" data-step-dot="1"></span>
+              <span class="step-dot" data-step-dot="2"></span>
+              <span class="step-dot" data-step-dot="3"></span>
+            </div>
+
+            <section class="panel form-page active" data-page="0">
+              <h3>Describe the situation</h3>
               <label>
-                What are you feeling right now?
-                <textarea name="feelings" rows="4" required placeholder="Tight chest, racing thoughts, dread, frustration..."></textarea>
+                What situation is making you anxious?
+                <textarea name="situation" rows="4" placeholder="Describe where you are, what happened, who is involved, or what triggered the anxiety."></textarea>
               </label>
               <label>
-                What are you worried might happen?
-                <textarea name="worry" rows="4" required placeholder="Write the specific feared outcome, even if it feels irrational."></textarea>
+                What are you anxious or worried about?
+                <textarea name="worry" rows="4" placeholder="Write the specific feared outcome, even if it feels irrational."></textarea>
+              </label>
+              <label>
+                What are you feeling in your body or emotions?
+                <textarea name="feelings" rows="3" placeholder="Tight chest, racing thoughts, dread, frustration..."></textarea>
               </label>
               <div class="scale-row">
                 <label for="anxietyBefore">Anxiety now</label>
-                <input id="anxietyBefore" name="anxietyBefore" type="range" min="0" max="10" value="5">
+                <input class="anxiety-range" id="anxietyBefore" name="anxietyBefore" type="range" min="0" max="10" value="5">
                 <output id="anxietyBeforeValue">5/10</output>
               </div>
             </section>
 
-            <section class="panel">
+            <section class="panel form-page" data-page="1">
               <h3>Check the thought</h3>
               <label>
                 What facts support this worry?
-                <textarea name="supportingFacts" rows="3" placeholder="Only observable evidence, not guesses."></textarea>
+                <textarea name="supportingFacts" rows="3" placeholder="Only observable evidence, not guesses.  These are not assumptions / possibilities."></textarea>
               </label>
               <label>
                 What facts make this worry less certain?
@@ -74,7 +91,7 @@
               </label>
             </section>
 
-            <section class="panel">
+            <section class="panel form-page" data-page="2">
               <h3>Control map</h3>
               <div class="control-grid">
                 <label>
@@ -88,16 +105,19 @@
               </div>
               <fieldset>
                 <legend>What kind of worry is this?</legend>
-                <label class="choice"><input type="radio" name="worryType" value="Actionable" checked> Actionable</label>
-                <label class="choice"><input type="radio" name="worryType" value="Uncertain or outside my control"> Uncertain or outside my control</label>
+                <label class="choice"><input type="radio" name="worryType" value="Actionable" checked> In my control</label>
+                <label class="choice"><input type="radio" name="worryType" value="Uncertain or outside my control"> Outside my control</label>
                 <label class="choice"><input type="radio" name="worryType" value="Mixed"> Mixed</label>
               </fieldset>
             </section>
 
-            <section class="panel">
+            <section class="panel form-page" data-page="3">
               <h3>Next step</h3>
               <label>
-                Balanced thought
+                <span class="label-with-help">
+                  Balanced thought
+                  <span class="help-tooltip" tabindex="0" aria-label="A balanced thought is a realistic replacement for the anxious thought. It includes the concern, the evidence, and a fairer outcome without forcing positivity.">?</span>
+                </span>
                 <textarea name="balancedThought" rows="3" placeholder="A realistic replacement thought, not forced positivity."></textarea>
               </label>
               <label>
@@ -105,18 +125,23 @@
                 <input name="nextAction" type="text" placeholder="One concrete thing you can do in the next 10 minutes">
               </label>
               <label>
-                Let-go statement
+                <span class="label-with-help">
+                  Let-go statement
+                  <span class="help-tooltip" tabindex="0" aria-label="A let-go statement names the part you cannot control and gives yourself permission to stop solving it right now. It can sound like: I cannot know this yet, so I am choosing one useful action and letting the rest be uncertain.">?</span>
+                </span>
                 <input name="lettingGo" type="text" placeholder="For the part outside my control, I am practicing letting it be uncertain.">
               </label>
               <div class="scale-row">
                 <label for="anxietyAfter">Anxiety after writing</label>
-                <input id="anxietyAfter" name="anxietyAfter" type="range" min="0" max="10" value="5">
+                <input class="anxiety-range" id="anxietyAfter" name="anxietyAfter" type="range" min="0" max="10" value="5">
                 <output id="anxietyAfterValue">5/10</output>
               </div>
             </section>
 
             <div class="actions">
-              <button class="primary" type="submit">Save entry</button>
+              <button class="secondary" type="button" id="prevPage">Back</button>
+              <button class="primary" type="button" id="nextPage">Next</button>
+              <button class="primary hidden" type="submit" id="saveEntry">Save entry</button>
             </div>
           </form>
         </section>
@@ -145,7 +170,7 @@
               </fieldset>
               <label>
                 What am I feeling now?
-                <textarea name="currentFeeling" rows="3" required></textarea>
+                <textarea name="currentFeeling" rows="3"></textarea>
               </label>
               <label>
                 What actually happened, or what do I know now?
@@ -155,9 +180,26 @@
                 What closure or next step do I want to record?
                 <textarea name="closure" rows="3"></textarea>
               </label>
+              <div class="control-grid">
+                <label>
+                  Status
+                  <select name="statusUpdate">
+                    <option value="">Keep current status</option>
+                    <option value="Open">Open</option>
+                    <option value="Improved">Improved</option>
+                    <option value="Needs review">Needs review</option>
+                    <option value="Recurring">Recurring</option>
+                    <option value="Closed">Closed</option>
+                  </select>
+                </label>
+                <label>
+                  Next reminder
+                  <input name="reminderDate" type="date">
+                </label>
+              </div>
               <div class="scale-row">
                 <label for="reviewAnxiety">Anxiety now</label>
-                <input id="reviewAnxiety" name="reviewAnxiety" type="range" min="0" max="10" value="3">
+                <input class="anxiety-range" id="reviewAnxiety" name="reviewAnxiety" type="range" min="0" max="10" value="3">
                 <output id="reviewAnxietyValue">3/10</output>
               </div>
             </section>
@@ -168,6 +210,70 @@
           </form>
         </section>
 
+        <section class="view" id="dailyView">
+          <div class="toolbar">
+            <div>
+              <p class="eyebrow">Daily check-in</p>
+              <h2>Journal about your day</h2>
+              <p class="intro">Write freely about what happened, how you felt, and anything you want to remember.</p>
+            </div>
+            <section class="points-panel" aria-live="polite">
+              <span id="pointTotal">0</span>
+              <p>points</p>
+            </section>
+          </div>
+
+          <form id="dailyForm" class="workspace">
+            <section class="panel">
+              <h3 id="dailyFormTitle">Today</h3>
+              <label>
+                What happened today?
+                <textarea name="daySummary" rows="5" placeholder="Moments, conversations, wins, stressors, routines, surprises..."></textarea>
+              </label>
+              <label>
+                What feelings showed up?
+                <textarea name="dayFeelings" rows="4" placeholder="Name emotions, body sensations, energy level, or anything that stood out."></textarea>
+              </label>
+              <label>
+                Anything I want to carry forward?
+                <textarea name="dayTakeaway" rows="3" placeholder="A lesson, gratitude, boundary, reminder, or next step."></textarea>
+              </label>
+              <div class="scale-row">
+                <label for="dailyMood">Mood today</label>
+                <input id="dailyMood" name="dailyMood" type="range" min="0" max="10" value="5">
+                <output id="dailyMoodValue">5/10</output>
+              </div>
+            </section>
+            <div class="actions">
+              <button class="secondary hidden" type="button" id="cancelDailyEdit">Cancel edit</button>
+              <button class="primary" type="submit" id="dailySubmit">Save daily entry</button>
+            </div>
+          </form>
+
+          <section class="panel daily-history">
+            <div class="toolbar compact-toolbar">
+              <div>
+                <p class="eyebrow">Record</p>
+                <h3>Daily entries</h3>
+              </div>
+              <p id="dailyStreak" class="streak-text">0 day streak</p>
+            </div>
+            <div id="dailyList" class="daily-list"></div>
+          </section>
+
+          <section class="panel sticker-logbook">
+            <div class="toolbar compact-toolbar">
+              <div>
+                <p class="eyebrow">Logbook</p>
+                <h3>Sticker collection</h3>
+              </div>
+              <p id="nextStickerText" class="streak-text">7 daily entries until your next sticker</p>
+            </div>
+            <div id="stickerList" class="sticker-list"></div>
+          </section>
+          
+        </section>
+
         <section class="view" id="libraryView">
           <div class="toolbar">
             <div>
@@ -176,10 +282,30 @@
             </div>
             <div class="toolbar-actions">
               <input id="searchEntries" type="search" placeholder="Search entries">
+              <input class="file-input" id="importFile" type="file" accept="application/json,.json">
+              <button class="secondary" type="button" id="importEntries">Import</button>
               <button class="secondary" type="button" id="exportEntries">Export</button>
             </div>
           </div>
           <div id="entryList" class="entry-list"></div>
+        </section>
+
+        <section class="view" id="trendsView">
+          <div class="toolbar">
+            <div>
+              <p class="eyebrow">Patterns</p>
+              <h2>Trends</h2>
+            </div>
+          </div>
+          <div id="trendStats" class="stats-grid"></div>
+          <section class="panel trends-panel">
+            <h3>Anxiety before and after entries</h3>
+            <div id="trendChart" class="trend-chart"></div>
+          </section>
+          <section class="panel trends-panel">
+            <h3>Reminders</h3>
+            <div id="reminderList" class="reminder-list"></div>
+          </section>
         </section>
       </main>
     </div>
@@ -195,12 +321,48 @@
         </div>
         <p class="entry-preview"></p>
         <div class="metrics"></div>
+        <div class="entry-controls">
+          <label>
+            Status
+            <select class="entry-status">
+              <option value="Open">Open</option>
+              <option value="Improved">Improved</option>
+              <option value="Needs review">Needs review</option>
+              <option value="Recurring">Recurring</option>
+              <option value="Closed">Closed</option>
+            </select>
+          </label>
+          <label>
+            Review reminder
+            <input class="entry-reminder" type="date">
+          </label>
+          <label class="entry-notes-field">
+            Notes
+            <textarea class="entry-notes" rows="3" placeholder="Add follow-up thoughts, context, or anything useful to remember."></textarea>
+          </label>
+        </div>
         <div class="card-actions">
+          <button class="secondary view-entry" type="button">View</button>
           <button class="secondary review-entry" type="button">Review</button>
           <button class="ghost delete-entry" type="button">Delete</button>
         </div>
       </article>
     </template>
+
+    <div class="modal-backdrop hidden" id="entryModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <article class="modal-panel">
+        <div class="modal-head">
+          <div>
+            <p class="eyebrow">Journal entry</p>
+            <h2 id="modalTitle">Entry</h2>
+          </div>
+          <button class="secondary icon-button" type="button" id="closeModal" aria-label="Close entry details">x</button>
+        </div>
+        <div id="modalContent" class="modal-content"></div>
+      </article>
+    </div>
+
+    <div class="toast hidden" id="toast" role="status" aria-live="polite"></div>
 
     <script src="app.js"></script>
   </body>
