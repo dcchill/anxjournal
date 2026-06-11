@@ -18,8 +18,8 @@
         </div>
 
         <nav class="tabs" aria-label="App sections">
-          <button class="tab active" type="button" data-view="journal">New entry</button>
-          <button class="tab" type="button" data-view="daily">Daily journal</button>
+          <button class="tab active" type="button" data-view="daily">Daily journal</button>
+          <button class="tab" type="button" data-view="journal">New entry</button>
           <button class="tab" type="button" data-view="library">Entries</button>
           <button class="tab" type="button" data-view="trends">Trends</button>
         </nav>
@@ -34,7 +34,7 @@
       </header>
 
       <main>
-        <section class="view active" id="journalView">
+        <section class="view" id="journalView">
           <div class="toolbar">
             <div>
               <p class="eyebrow">Guided exercise</p>
@@ -213,7 +213,7 @@
           </form>
         </section>
 
-        <section class="view" id="dailyView">
+        <section class="view active" id="dailyView">
           <div class="toolbar">
             <div>
               <p class="eyebrow">Daily check-in</p>
@@ -253,17 +253,6 @@
             </div>
           </form>
 
-          <section class="panel daily-history">
-            <div class="toolbar compact-toolbar">
-              <div>
-                <p class="eyebrow">Record</p>
-                <h3>Daily entries</h3>
-              </div>
-              <p id="dailyStreak" class="streak-text">0 day streak</p>
-            </div>
-            <div id="dailyList" class="daily-list"></div>
-          </section>
-
           <section class="panel sticker-logbook">
             <div class="toolbar compact-toolbar">
               <div>
@@ -297,6 +286,16 @@
             </div>
           </div>
           <div id="entryList" class="entry-list"></div>
+          <section class="panel daily-history">
+            <div class="toolbar compact-toolbar">
+              <div>
+                <p class="eyebrow">Daily journal</p>
+                <h3>Daily entries</h3>
+              </div>
+              <p id="dailyStreak" class="streak-text">0 day streak</p>
+            </div>
+            <div id="dailyList" class="daily-list"></div>
+          </section>
         </section>
 
         <section class="view" id="trendsView">
