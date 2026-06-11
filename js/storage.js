@@ -4,6 +4,9 @@ const STORAGE_KEY = "anxjournal.entries.v1";
 const DAILY_STORAGE_KEY = "anxjournal.dailyEntries.v1";
 const POINTS_STORAGE_KEY = "anxjournal.points.v1";
 const STICKERS_STORAGE_KEY = "anxjournal.stickers.v1";
+const OWNED_REWARDS_STORAGE_KEY = "anxjournal.ownedRewards.v1";
+const PROFILE_PICTURE_STORAGE_KEY = "anxjournal.profilePicture.v1";
+const SKIP_DAYS_STORAGE_KEY = "anxjournal.skipDays.v1";
 
 function loadJson(key, fallback) {
   try {
@@ -29,6 +32,18 @@ export function loadStickers() {
   return loadJson(STICKERS_STORAGE_KEY, []);
 }
 
+export function loadOwnedRewards() {
+  return loadJson(OWNED_REWARDS_STORAGE_KEY, []);
+}
+
+export function loadProfilePicture() {
+  return localStorage.getItem(PROFILE_PICTURE_STORAGE_KEY) || "Default";
+}
+
+export function loadSkipDays() {
+  return loadJson(SKIP_DAYS_STORAGE_KEY, []);
+}
+
 export function saveEntries(entries) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
 }
@@ -45,6 +60,18 @@ export function saveStickers(stickers) {
   localStorage.setItem(STICKERS_STORAGE_KEY, JSON.stringify(stickers));
 }
 
+export function saveOwnedRewards(ownedRewards) {
+  localStorage.setItem(OWNED_REWARDS_STORAGE_KEY, JSON.stringify(ownedRewards));
+}
+
+export function saveProfilePicture(profilePicture) {
+  localStorage.setItem(PROFILE_PICTURE_STORAGE_KEY, profilePicture);
+}
+
+export function saveSkipDays(skipDays) {
+  localStorage.setItem(SKIP_DAYS_STORAGE_KEY, JSON.stringify(skipDays));
+}
+
 export function createBackupPayload(state) {
   return {
     version: 2,
@@ -53,6 +80,9 @@ export function createBackupPayload(state) {
     dailyEntries: state.dailyEntries,
     points: state.points,
     stickers: state.stickers,
+    ownedRewards: state.ownedRewards,
+    profilePicture: state.profilePicture,
+    skipDays: state.skipDays,
   };
 }
 
@@ -63,6 +93,9 @@ export function normalizeBackup(imported) {
       dailyEntries: [],
       points: 0,
       stickers: [],
+      ownedRewards: [],
+      profilePicture: "Default",
+      skipDays: [],
     };
   }
 
@@ -75,6 +108,9 @@ export function normalizeBackup(imported) {
     dailyEntries: Array.isArray(imported.dailyEntries) ? imported.dailyEntries.map(normalizeImportedDailyEntry) : [],
     points: Number(imported.points || 0),
     stickers: Array.isArray(imported.stickers) ? imported.stickers.map(normalizeImportedSticker) : [],
+    ownedRewards: Array.isArray(imported.ownedRewards) ? imported.ownedRewards : [],
+    profilePicture: imported.profilePicture || "Default",
+    skipDays: Array.isArray(imported.skipDays) ? imported.skipDays : [],
   };
 }
 
@@ -120,9 +156,12 @@ function normalizeImportedSticker(sticker) {
   return {
     ...sticker,
     id: sticker.id || crypto.randomUUID(),
+    type: sticker.type || "daily",
     icon: sticker.icon || "Star",
     name: sticker.name || "Daily Sticker",
     milestone: sticker.milestone || 7,
+    days: sticker.days || "",
+    description: sticker.description || "",
     earnedAt: sticker.earnedAt || new Date().toISOString(),
   };
 }

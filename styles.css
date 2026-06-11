@@ -679,6 +679,10 @@ output {
   margin-top: 22px;
 }
 
+.rewards-shop {
+  margin-top: 22px;
+}
+
 .compact-toolbar {
   margin-bottom: 16px;
 }
@@ -789,6 +793,59 @@ output {
   color: var(--muted);
   font-size: 0.88rem;
   line-height: 1.35;
+}
+
+.reward-shop-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 12px;
+}
+
+.reward-card {
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+}
+
+.reward-card button {
+  grid-column: 1 / -1;
+}
+
+.reward-card h4 {
+  margin: 0 0 4px;
+  font-size: 1rem;
+}
+
+.reward-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.35;
+}
+
+.reward-icon {
+  display: grid;
+  width: 58px;
+  height: 58px;
+  place-items: center;
+  border: 1px solid #d8cab7;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #fff9ef 0%, #edf6ef 100%);
+  color: var(--green-dark);
+  font-size: 0.76rem;
+  font-weight: 900;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.skip-card {
+  border-color: rgba(95, 131, 112, 0.42);
+  background: rgba(241, 246, 239, 0.72);
 }
 
 .modal-backdrop {

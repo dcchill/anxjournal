@@ -6,7 +6,10 @@ import { createToast } from "./js/toast.js";
 import {
   loadDailyEntries,
   loadEntries,
+  loadOwnedRewards,
   loadPoints,
+  loadProfilePicture,
+  loadSkipDays,
   loadStickers,
 } from "./js/storage.js";
 
@@ -15,6 +18,9 @@ const state = {
   dailyEntries: loadDailyEntries(),
   points: loadPoints(),
   stickers: loadStickers(),
+  ownedRewards: loadOwnedRewards(),
+  profilePicture: loadProfilePicture(),
+  skipDays: loadSkipDays(),
   activeReviewId: null,
   editingDailyId: null,
   journalPage: 0,
@@ -32,6 +38,7 @@ const elements = {
   entryList: document.querySelector("#entryList"),
   dailyList: document.querySelector("#dailyList"),
   stickerList: document.querySelector("#stickerList"),
+  rewardShopList: document.querySelector("#rewardShopList"),
   searchEntries: document.querySelector("#searchEntries"),
   cancelDailyEditButton: document.querySelector("#cancelDailyEdit"),
   dailySubmitButton: document.querySelector("#dailySubmit"),

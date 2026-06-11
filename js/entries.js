@@ -3,7 +3,10 @@ import {
   normalizeBackup,
   saveDailyEntries,
   saveEntries,
+  saveOwnedRewards,
   savePoints,
+  saveProfilePicture,
+  saveSkipDays,
   saveStickers,
 } from "./storage.js";
 import {
@@ -319,6 +322,8 @@ export function setupEntries({ state, elements, render, showView, updateRangeLab
         const existingDailyIds = new Set(state.dailyEntries.map((entry) => entry.id));
         const existingDailyDates = new Set(state.dailyEntries.map((entry) => entry.dateKey));
         const existingStickerIds = new Set(state.stickers.map((sticker) => sticker.id));
+        const existingRewardIds = new Set(state.ownedRewards);
+        const existingSkipDays = new Set(state.skipDays);
         const newEntries = backup.entries.filter((entry) => !existingEntryIds.has(entry.id));
         const newDailyEntries = backup.dailyEntries.filter((entry) => {
           if (existingDailyIds.has(entry.id) || existingDailyDates.has(entry.dateKey)) return false;
@@ -326,8 +331,15 @@ export function setupEntries({ state, elements, render, showView, updateRangeLab
           return true;
         });
         const newStickers = backup.stickers.filter((sticker) => !existingStickerIds.has(sticker.id));
+        const newOwnedRewards = backup.ownedRewards.filter((id) => !existingRewardIds.has(id));
+        const newSkipDays = backup.skipDays.filter((dateKey) => {
+          if (existingSkipDays.has(dateKey)) return false;
+          existingSkipDays.add(dateKey);
+          return true;
+        });
         const duplicateCount = backup.entries.length + backup.dailyEntries.length + backup.stickers.length
-          - newEntries.length - newDailyEntries.length - newStickers.length;
+          + backup.ownedRewards.length + backup.skipDays.length
+          - newEntries.length - newDailyEntries.length - newStickers.length - newOwnedRewards.length - newSkipDays.length;
 
         state.entries = [...newEntries, ...state.entries].sort((a, b) => {
           return new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt);
@@ -339,14 +351,19 @@ export function setupEntries({ state, elements, render, showView, updateRangeLab
         state.stickers = [...newStickers, ...state.stickers].sort((a, b) => {
           return Number(a.milestone || 0) - Number(b.milestone || 0);
         });
-        state.points = Math.max(state.points, daily.getUniqueDailyCount() * 10);
+        state.ownedRewards = [...new Set([...state.ownedRewards, ...newOwnedRewards])];
+        state.profilePicture = backup.profilePicture || state.profilePicture;
+        state.skipDays = [...new Set([...state.skipDays, ...newSkipDays])];
         daily.awardAvailableStickers();
         saveEntries(state.entries);
         saveDailyEntries(state.dailyEntries);
         savePoints(state.points);
         saveStickers(state.stickers);
+        saveOwnedRewards(state.ownedRewards);
+        saveProfilePicture(state.profilePicture);
+        saveSkipDays(state.skipDays);
         render();
-        showToast(`Imported ${newEntries.length} anxiety entries, ${newDailyEntries.length} daily entries, and ${newStickers.length} stickers.${duplicateCount ? ` Skipped ${duplicateCount} duplicates.` : ""}`);
+        showToast(`Imported ${newEntries.length} anxiety entries, ${newDailyEntries.length} daily entries, ${newStickers.length} stickers, and ${newOwnedRewards.length} rewards.${duplicateCount ? ` Skipped ${duplicateCount} duplicates.` : ""}`);
       } catch (error) {
         showToast(`Import failed: ${error.message}`);
       } finally {
