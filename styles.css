@@ -1071,8 +1071,16 @@ output {
     flex-direction: column;
   }
 
+  .tabs {
+    gap: 6px;
+    padding: 8px;
+    border-radius: 14px;
+  }
+
   .tab {
     width: 100%;
+    min-width: 0;
+    border-radius: 10px;
   }
 
   .scale-row {

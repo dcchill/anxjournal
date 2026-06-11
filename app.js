@@ -43,14 +43,14 @@ const toast = document.querySelector("#toast");
 let toastTimer = null;
 
 const stickerCatalog = [
-  { icon: "Sunrise", name: "Fresh Start" },
-  { icon: "Tea", name: "Steady Sip" },
-  { icon: "Leaf", name: "Gentle Growth" },
-  { icon: "Moon", name: "Quiet Night" },
-  { icon: "Star", name: "Small Win" },
-  { icon: "Heart", name: "Kind Mind" },
-  { icon: "Cloud", name: "Soft Landing" },
-  { icon: "Home", name: "Safe Place" },
+  { icon: "Sunrise", name: "Sunrise" },
+  { icon: "Tea", name: "Tea" },
+  { icon: "Leaf", name: "Leaf" },
+  { icon: "Moon", name: "Moon" },
+  { icon: "Star", name: "Star" },
+  { icon: "Heart", name: "Heart" },
+  { icon: "Cloud", name: "Cloud" },
+  { icon: "Home", name: "Home" },
 ];
 
 const formatDate = new Intl.DateTimeFormat(undefined, {
