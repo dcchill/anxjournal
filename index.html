@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AnxJournal</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div>
+          <p class="eyebrow">AnxJournal</p>
+          <h1>Anxiety journal</h1>
+          <p class="intro">Name the worry, separate facts from fears, and decide what is actually in your control.</p>
+        </div>
+
+        <nav class="tabs" aria-label="App sections">
+          <button class="tab active" type="button" data-view="journal">New entry</button>
+          <button class="tab" type="button" data-view="review">Review</button>
+          <button class="tab" type="button" data-view="library">Entries</button>
+        </nav>
+
+        <section class="status-panel" aria-live="polite">
+          <span class="status-dot"></span>
+          <div>
+            <strong id="entryCount">0 entries</strong>
+            <p id="lastSaved">Nothing saved yet</p>
+          </div>
+        </section>
+      </aside>
+
+      <main>
+        <section class="view active" id="journalView">
+          <div class="toolbar">
+            <div>
+              <p class="eyebrow">Guided exercise</p>
+              <h2>Create a new entry</h2>
+            </div>
+            <button class="secondary" type="button" id="clearForm">Clear</button>
+          </div>
+
+          <form id="journalForm" class="workspace">
+            <section class="panel">
+              <h3>What is happening?</h3>
+              <label>
+                What are you feeling right now?
+                <textarea name="feelings" rows="4" required placeholder="Tight chest, racing thoughts, dread, frustration..."></textarea>
+              </label>
+              <label>
+                What are you worried might happen?
+                <textarea name="worry" rows="4" required placeholder="Write the specific feared outcome, even if it feels irrational."></textarea>
+              </label>
+              <div class="scale-row">
+                <label for="anxietyBefore">Anxiety now</label>
+                <input id="anxietyBefore" name="anxietyBefore" type="range" min="0" max="10" value="5">
+                <output id="anxietyBeforeValue">5/10</output>
+              </div>
+            </section>
+
+            <section class="panel">
+              <h3>Check the thought</h3>
+              <label>
+                What facts support this worry?
+                <textarea name="supportingFacts" rows="3" placeholder="Only observable evidence, not guesses."></textarea>
+              </label>
+              <label>
+                What facts make this worry less certain?
+                <textarea name="balancingFacts" rows="3" placeholder="Past outcomes, missing information, other explanations, support you have."></textarea>
+              </label>
+              <label>
+                What would you tell a friend who had this exact worry?
+                <textarea name="friendAdvice" rows="3" placeholder="Use the same fairness you would offer someone else."></textarea>
+              </label>
+            </section>
+
+            <section class="panel">
+              <h3>Control map</h3>
+              <div class="control-grid">
+                <label>
+                  In my control
+                  <textarea name="inControl" rows="4" placeholder="Actions, communication, preparation, boundaries, rest."></textarea>
+                </label>
+                <label>
+                  Outside my control
+                  <textarea name="outControl" rows="4" placeholder="Other people's reactions, the past, uncertainty, timing."></textarea>
+                </label>
+              </div>
+              <fieldset>
+                <legend>What kind of worry is this?</legend>
+                <label class="choice"><input type="radio" name="worryType" value="Actionable" checked> Actionable</label>
+                <label class="choice"><input type="radio" name="worryType" value="Uncertain or outside my control"> Uncertain or outside my control</label>
+                <label class="choice"><input type="radio" name="worryType" value="Mixed"> Mixed</label>
+              </fieldset>
+            </section>
+
+            <section class="panel">
+              <h3>Next step</h3>
+              <label>
+                Balanced thought
+                <textarea name="balancedThought" rows="3" placeholder="A realistic replacement thought, not forced positivity."></textarea>
+              </label>
+              <label>
+                Small next action
+                <input name="nextAction" type="text" placeholder="One concrete thing you can do in the next 10 minutes">
+              </label>
+              <label>
+                Let-go statement
+                <input name="lettingGo" type="text" placeholder="For the part outside my control, I am practicing letting it be uncertain.">
+              </label>
+              <div class="scale-row">
+                <label for="anxietyAfter">Anxiety after writing</label>
+                <input id="anxietyAfter" name="anxietyAfter" type="range" min="0" max="10" value="5">
+                <output id="anxietyAfterValue">5/10</output>
+              </div>
+            </section>
+
+            <div class="actions">
+              <button class="primary" type="submit">Save entry</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="view" id="reviewView">
+          <div class="toolbar">
+            <div>
+              <p class="eyebrow">Follow-up</p>
+              <h2>Review an entry</h2>
+            </div>
+            <select id="reviewSelect" aria-label="Choose entry to review"></select>
+          </div>
+          <div id="reviewEmpty" class="empty-state">Saved entries will appear here for follow-up.</div>
+          <form id="reviewForm" class="workspace hidden">
+            <section class="panel">
+              <h3 id="reviewTitle">Review</h3>
+              <dl class="entry-summary" id="reviewSummary"></dl>
+            </section>
+            <section class="panel">
+              <h3>Update</h3>
+              <fieldset>
+                <legend>Am I still anxious about this?</legend>
+                <label class="choice"><input type="radio" name="stillAnxious" value="Yes" checked> Yes</label>
+                <label class="choice"><input type="radio" name="stillAnxious" value="Somewhat"> Somewhat</label>
+                <label class="choice"><input type="radio" name="stillAnxious" value="No"> No</label>
+              </fieldset>
+              <label>
+                What am I feeling now?
+                <textarea name="currentFeeling" rows="3" required></textarea>
+              </label>
+              <label>
+                What actually happened, or what do I know now?
+                <textarea name="whatHappened" rows="3"></textarea>
+              </label>
+              <label>
+                What closure or next step do I want to record?
+                <textarea name="closure" rows="3"></textarea>
+              </label>
+              <div class="scale-row">
+                <label for="reviewAnxiety">Anxiety now</label>
+                <input id="reviewAnxiety" name="reviewAnxiety" type="range" min="0" max="10" value="3">
+                <output id="reviewAnxietyValue">3/10</output>
+              </div>
+            </section>
+            <div class="actions">
+              <button class="primary" type="submit">Save review</button>
+              <button class="secondary" type="button" id="markClosed">Mark closed</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="view" id="libraryView">
+          <div class="toolbar">
+            <div>
+              <p class="eyebrow">Saved work</p>
+              <h2>Previous entries</h2>
+            </div>
+            <div class="toolbar-actions">
+              <input id="searchEntries" type="search" placeholder="Search entries">
+              <button class="secondary" type="button" id="exportEntries">Export</button>
+            </div>
+          </div>
+          <div id="entryList" class="entry-list"></div>
+        </section>
+      </main>
+    </div>
+
+    <template id="entryCardTemplate">
+      <article class="entry-card">
+        <div class="entry-card-head">
+          <div>
+            <p class="entry-date"></p>
+            <h3 class="entry-heading"></h3>
+          </div>
+          <span class="badge"></span>
+        </div>
+        <p class="entry-preview"></p>
+        <div class="metrics"></div>
+        <div class="card-actions">
+          <button class="secondary review-entry" type="button">Review</button>
+          <button class="ghost delete-entry" type="button">Delete</button>
+        </div>
+      </article>
+    </template>
+
+    <script src="app.js"></script>
+  </body>
+</html>
